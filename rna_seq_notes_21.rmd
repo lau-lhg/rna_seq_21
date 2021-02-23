@@ -1,0 +1,22 @@
+---
+title: "rna_seq_notes_21"
+author: "lau-lhg"
+date: "2/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
