@@ -179,9 +179,15 @@ Como los renglones corresponden a los genes, aqui nos muestra un sub-set con só
 ## Comando 2
 rse[, c("A", "D", "F")]
 head(assay(rse[, c("A", "D", "F")]))
+#tras bambalinas
+which(colnames(rse)%in%c("A", "D", "F"))
 ```
-Como las columnas son features, aquí accesamos a un subset con las primeras tres features.
+Como las columnas son muestras, aquí accesamos a un subset con las primeras tres.
 
+```{r}
+#tambien podemos accesar así
+rse$Treatment
+```
 
 
 
