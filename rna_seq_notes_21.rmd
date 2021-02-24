@@ -4,19 +4,123 @@ author: "lau-lhg"
 date: "2/23/2021"
 output: html_document
 ---
+Original notes taken in notion.so 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-```{r}
-
-```
-
-
-```{r}
+```{r eval=FALSE}
+## Opción más nueva:
+library("gert")
+repo <- git_clone(
+    "https://github.com/lcolladotor/rnaseq_LCG-UNAM_2021",
+    "~/rnaseq_LCG-UNAM_2021"
+)
+setwd(repo)
 
 ```
+
+# RNA-seq
+
+Class guide: [https://lcolladotor.github.io/rnaseq_LCG-UNAM_2021/introducción-a-r-y-rstudio.html](https://lcolladotor.github.io/rnaseq_LCG-UNAM_2021/introducci%C3%B3n-a-r-y-rstudio.html)
+
+▶️ This class will focus on RNA-seq data analysis
+
+If you don't want to install all the libraries, you can use the server: [http://132.248.220.108:8787/](http://132.248.220.108:8787/)
+
+---
+
+### Creating an R project and linking to GitHub
+
+- Exercise 1: My first R project (this repository)
+
+From R studio, you can create a project. Make sure you're standing in whichever directory you want to build it or use the absolute route in the argument. 
+
+```{r eval=FALSE}
+#create project
+usethis::create_project("/path/my_new_project")
+##setup file
+usethis::use_r("name.R")
+#once your project is created, you can add .r and .rmd files within it
+```
+
+To connect it to GitHub, you must first obtain a token to validate your identity. Run the line below and a pop-up will open, from where you must fill out your name (once you're signed in to GitHub) and then press the large green button at the bottom. Save the token you are given.
+
+```{r eval=FALSE}
+#get token
+usethis::create_github_token()
+#then this
+gitcreds::gitcreds_set()
+#you will be asked for your token here
+
+```
+
+While using the server, something with the token went wrong. An alternative way to configure it is: 
+
+```{r eval=FALSE}
+usethis::edit_r_environ()
+#This will open a file
+```
+
+Within the file write your token and add a new line, save file, and restart R session.
+
+```{r eval=FALSE}
+GITHUB_PAT= token
+
+```
+
+Now we can finish the GitHub configuration:
+
+```{r eval=FALSE}
+#this will open another file
+usethis::edit_git_config()
+#fill it out with your GitHub account info
+
+#connect
+usethis::use_git()
+usethis::use_github()
+```
+
+- Postcard Exercise
+
+    Create your own profile/webpage (git was already configured)
+
+    ```{r eval=FALSE}
+    #create project
+    usethis::create_project("lau-lhg.github.io")
+
+    #start git
+    usethis::use_git()
+    usethis::use_github()
+
+    #postcard
+    postcards::create_postcard(template = "onofre")
+    #other templates are: "jolla", "jolla-blue", "trestles"
+
+    #then commit and push channges
+    ```
+
+    Result: 
+[https://lau-lhg.github.io/](https://lau-lhg.github.io/)
+
+### Bio-conductor and Packages
+
+> "Analysis and comprehension of high-throughput genomic data"
+
+---
+
+Packages can be classified as either: software, annotation, experiment, workflow.
+
+[Bioconductor Software Packages](http://bioconductor.org/packages/3.12/bioc/)
+
+There's a whole community dedicated to testing and improving packages, but it's important to be mindful of the code you use, to know if using it is a good idea.
+
+- Team Exercise: Select one or two packages each and discuss.
+**Team: Ana Sofia Escobedo, Leonardo Correa, Laura Hinojosa**
+
+My Package of choice: spatialHeatMap
+
+I liked that it had been widely tested.The code seems well documented, and is open-source (duh). there were no issues reported in GitHub. I personally enjoy working with graphs and figures, which is mostly the reason for my preferring this, but it looks that the team behind this package is quite active and using it sounds like a decent idea.
+
+
+
+
 
 
