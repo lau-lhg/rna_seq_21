@@ -119,6 +119,17 @@ My Package of choice: spatialHeatMap
 
 I liked that it had been widely tested.The code seems well documented, and is open-source (duh). there were no issues reported in GitHub. I personally enjoy working with graphs and figures, which is mostly the reason for my preferring this, but it looks that the team behind this package is quite active and using it sounds like a decent idea.
 
+### Summarized Experiment
+Summarized experiment es un objeto cuya parte principal consiste de tres tablas unidas. 
+
+- rowRanges: tabla de información de los genes, un renglón por cada gen. Es un objeto tipo genomic ranges.
+- assays: (one or more) un renglon por gen, una columns por muestra.
+- colData: un renglón por cada muestra, una columna por cada variable de info.
+
+Es posible crear versiones distintas de este tipo de dato, con más tablas relacionadas. Es fácil conceptualizarlo como una base de datos.
+
+rtrach layer es un paquete que te permite leer datos de distintos formatos bioinformáticos (BED, GTF, etc).
+
 ```{r}
 ## Lets build our first SummarizedExperiment object
 library("SummarizedExperiment")
@@ -189,6 +200,15 @@ Como las columnas son muestras, aquí accesamos a un subset con las primeras tre
 rse$Treatment
 ```
 
+Exploremos las tres sub-tablas de nuestro objeto.
+```{r}
+print('ASSAY')
+head(assay(rse))
+print('ROWRANGES')
+head(rowRanges(rse))
+print('COLDATA')
+head(colData(rse))
+```
 
 
 
