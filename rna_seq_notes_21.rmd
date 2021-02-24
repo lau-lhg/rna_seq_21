@@ -185,3 +185,5 @@ Como las columnas son features, aquí accesamos a un subset con las primeras tre
 
 
 
+
+
