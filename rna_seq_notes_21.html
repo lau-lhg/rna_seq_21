@@ -248,6 +248,286 @@ postcards::create_postcard(template = &quot;onofre&quot;)
 <p>My Package of choice: spatialHeatMap</p>
 <p>I liked that it had been widely tested.The code seems well documented, and is open-source (duh). there were no issues reported in GitHub. I personally enjoy working with graphs and figures, which is mostly the reason for my preferring this, but it looks that the team behind this package is quite active and using it sounds like a decent idea.</p>
 </div>
+<div id="summarized-experiment" class="section level3">
+<h3>Summarized Experiment</h3>
+<p>Summarized experiment es un objeto cuya parte principal consiste de tres tablas unidas.</p>
+<ul>
+<li>rowRanges: tabla de información de los genes, un renglón por cada gen. Es un objeto tipo genomic ranges.</li>
+<li>assays: (one or more) un renglon por gen, una columns por muestra.</li>
+<li>colData: un renglón por cada muestra, una columna por cada variable de info.</li>
+</ul>
+<p>Es posible crear versiones distintas de este tipo de dato, con más tablas relacionadas. Es fácil conceptualizarlo como una base de datos.</p>
+<p>rtrach layer es un paquete que te permite leer datos de distintos formatos bioinformáticos (BED, GTF, etc).</p>
+<pre class="r"><code>## Lets build our first SummarizedExperiment object
+library(&quot;SummarizedExperiment&quot;)</code></pre>
+<pre><code>## Loading required package: MatrixGenerics</code></pre>
+<pre><code>## Loading required package: matrixStats</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MatrixGenerics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:matrixStats&#39;:
+## 
+##     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+##     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+##     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+##     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+##     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+##     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+##     colWeightedMeans, colWeightedMedians, colWeightedSds,
+##     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+##     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+##     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+##     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+##     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+##     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+##     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+##     rowWeightedSds, rowWeightedVars</code></pre>
+<pre><code>## Loading required package: GenomicRanges</code></pre>
+<pre><code>## Loading required package: stats4</code></pre>
+<pre><code>## Loading required package: BiocGenerics</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## 
+## Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:parallel&#39;:
+## 
+##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+##     clusterExport, clusterMap, parApply, parCapply, parLapply,
+##     parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+##     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+##     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+##     union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>## Loading required package: S4Vectors</code></pre>
+<pre><code>## 
+## Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     expand.grid</code></pre>
+<pre><code>## Loading required package: IRanges</code></pre>
+<pre><code>## Loading required package: GenomeInfoDb</code></pre>
+<pre><code>## Loading required package: Biobase</code></pre>
+<pre><code>## Welcome to Bioconductor
+## 
+##     Vignettes contain introductory material; view with
+##     &#39;browseVignettes()&#39;. To cite Bioconductor, see
+##     &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Biobase&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:MatrixGenerics&#39;:
+## 
+##     rowMedians</code></pre>
+<pre><code>## The following objects are masked from &#39;package:matrixStats&#39;:
+## 
+##     anyMissing, rowMedians</code></pre>
+<pre class="r"><code>## ?SummarizedExperiment
+
+## De los ejemplos en la ayuda oficial
+
+## Creamos los datos para nuestro objeto de tipo SummarizedExperiment
+## para 200 genes a lo largo de 6 muestras
+nrows &lt;- 200
+ncols &lt;- 6
+## Números al azar de cuentas
+set.seed(20210223)
+counts &lt;- matrix(runif(nrows * ncols, 1, 1e4), nrows)
+## Información de nuestros genes
+rowRanges &lt;- GRanges(
+    rep(c(&quot;chr1&quot;, &quot;chr2&quot;), c(50, 150)),
+    IRanges(floor(runif(200, 1e5, 1e6)), width = 100),
+    strand = sample(c(&quot;+&quot;, &quot;-&quot;), 200, TRUE),
+    feature_id = sprintf(&quot;ID%03d&quot;, 1:200)
+)
+names(rowRanges) &lt;- paste0(&quot;gene_&quot;, seq_len(length(rowRanges)))
+## Información de nuestras muestras
+colData &lt;- DataFrame(
+    Treatment = rep(c(&quot;ChIP&quot;, &quot;Input&quot;), 3),
+    row.names = LETTERS[1:6]
+)
+## Juntamos ahora toda la información en un solo objeto de R
+rse &lt;- SummarizedExperiment(
+    assays = SimpleList(counts = counts),
+    rowRanges = rowRanges,
+    colData = colData
+)
+
+## Exploremos el objeto resultante
+rse</code></pre>
+<pre><code>## class: RangedSummarizedExperiment 
+## dim: 200 6 
+## metadata(0):
+## assays(1): counts
+## rownames(200): gene_1 gene_2 ... gene_199 gene_200
+## rowData names(1): feature_id
+## colnames(6): A B ... E F
+## colData names(1): Treatment</code></pre>
+<pre class="r"><code>#tabla assay
+head(assay(rse))</code></pre>
+<pre><code>##               A        B         C         D         E        F
+## gene_1 2577.960 8526.615 2226.3070 3615.8967 1723.8851 3267.954
+## gene_2 7793.183 3462.579  478.2716 7688.3839  295.2813 2698.921
+## gene_3 9571.769 5280.564 9772.1671 9916.0076 2621.2085 6880.067
+## gene_4 4641.969 2784.091 6670.6757  258.5218 2771.8970 8737.586
+## gene_5 6436.758 7053.276 9978.8199 3588.1194 1447.9821 7290.890
+## gene_6 6845.704 1502.045 4383.5686 9750.8286 3529.3153 2192.060</code></pre>
+<pre class="r"><code>#ver los cromosomas
+seqlevels(rse)</code></pre>
+<pre><code>## [1] &quot;chr1&quot; &quot;chr2&quot;</code></pre>
+<pre class="r"><code>#Ejercicio
+
+## Comando 1
+rse[1:2, ]</code></pre>
+<pre><code>## class: RangedSummarizedExperiment 
+## dim: 2 6 
+## metadata(0):
+## assays(1): counts
+## rownames(2): gene_1 gene_2
+## rowData names(1): feature_id
+## colnames(6): A B ... E F
+## colData names(1): Treatment</code></pre>
+<pre class="r"><code>head(assay(rse[1:2, ]))</code></pre>
+<pre><code>##               A        B         C        D         E        F
+## gene_1 2577.960 8526.615 2226.3070 3615.897 1723.8851 3267.954
+## gene_2 7793.183 3462.579  478.2716 7688.384  295.2813 2698.921</code></pre>
+<p>Como los renglones corresponden a los genes, aqui nos muestra un sub-set con sólo los primeros 2 genes.</p>
+<pre class="r"><code>## Comando 2
+rse[, c(&quot;A&quot;, &quot;D&quot;, &quot;F&quot;)]</code></pre>
+<pre><code>## class: RangedSummarizedExperiment 
+## dim: 200 3 
+## metadata(0):
+## assays(1): counts
+## rownames(200): gene_1 gene_2 ... gene_199 gene_200
+## rowData names(1): feature_id
+## colnames(3): A D F
+## colData names(1): Treatment</code></pre>
+<pre class="r"><code>head(assay(rse[, c(&quot;A&quot;, &quot;D&quot;, &quot;F&quot;)]))</code></pre>
+<pre><code>##               A         D        F
+## gene_1 2577.960 3615.8967 3267.954
+## gene_2 7793.183 7688.3839 2698.921
+## gene_3 9571.769 9916.0076 6880.067
+## gene_4 4641.969  258.5218 8737.586
+## gene_5 6436.758 3588.1194 7290.890
+## gene_6 6845.704 9750.8286 2192.060</code></pre>
+<pre class="r"><code>#tras bambalinas
+which(colnames(rse)%in%c(&quot;A&quot;, &quot;D&quot;, &quot;F&quot;))</code></pre>
+<pre><code>## [1] 1 4 6</code></pre>
+<p>Como las columnas son muestras, aquí accesamos a un subset con las primeras tres.</p>
+<pre class="r"><code>#tambien podemos accesar así
+rse$Treatment</code></pre>
+<pre><code>## [1] &quot;ChIP&quot;  &quot;Input&quot; &quot;ChIP&quot;  &quot;Input&quot; &quot;ChIP&quot;  &quot;Input&quot;</code></pre>
+<p>Exploremos las tres sub-tablas de nuestro objeto.</p>
+<pre class="r"><code>print(&#39;ASSAY&#39;)</code></pre>
+<pre><code>## [1] &quot;ASSAY&quot;</code></pre>
+<pre class="r"><code>head(assay(rse))</code></pre>
+<pre><code>##               A        B         C         D         E        F
+## gene_1 2577.960 8526.615 2226.3070 3615.8967 1723.8851 3267.954
+## gene_2 7793.183 3462.579  478.2716 7688.3839  295.2813 2698.921
+## gene_3 9571.769 5280.564 9772.1671 9916.0076 2621.2085 6880.067
+## gene_4 4641.969 2784.091 6670.6757  258.5218 2771.8970 8737.586
+## gene_5 6436.758 7053.276 9978.8199 3588.1194 1447.9821 7290.890
+## gene_6 6845.704 1502.045 4383.5686 9750.8286 3529.3153 2192.060</code></pre>
+<pre class="r"><code>print(&#39;ROWRANGES&#39;)</code></pre>
+<pre><code>## [1] &quot;ROWRANGES&quot;</code></pre>
+<pre class="r"><code>head(rowRanges(rse))</code></pre>
+<pre><code>## GRanges object with 6 ranges and 1 metadata column:
+##          seqnames        ranges strand |  feature_id
+##             &lt;Rle&gt;     &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
+##   gene_1     chr1 286235-286334      + |       ID001
+##   gene_2     chr1 586770-586869      - |       ID002
+##   gene_3     chr1 577897-577996      + |       ID003
+##   gene_4     chr1 494350-494449      + |       ID004
+##   gene_5     chr1 686692-686791      - |       ID005
+##   gene_6     chr1 119200-119299      + |       ID006
+##   -------
+##   seqinfo: 2 sequences from an unspecified genome; no seqlengths</code></pre>
+<pre class="r"><code>print(&#39;COLDATA&#39;)</code></pre>
+<pre><code>## [1] &quot;COLDATA&quot;</code></pre>
+<pre class="r"><code>head(colData(rse))</code></pre>
+<pre><code>## DataFrame with 6 rows and 1 column
+##     Treatment
+##   &lt;character&gt;
+## A        ChIP
+## B       Input
+## C        ChIP
+## D       Input
+## E        ChIP
+## F       Input</code></pre>
+<p>To view all of this information in painfully beautiful graphs, do:</p>
+<pre class="r"><code>## Explora el objeto rse de forma interactiva
+library(&quot;iSEE&quot;)
+iSEE::iSEE(rse)</code></pre>
+<div id="exercise-2" class="section level4">
+<h4>Exercise 2</h4>
+<pre class="r"><code>## Descarguemos unos datos de spatialLIBD
+sce_layer &lt;- spatialLIBD::fetch_data(&quot;sce_layer&quot;)</code></pre>
+<pre><code>## using temporary cache /tmp/Rtmp9DrSh6/BiocFileCache</code></pre>
+<pre><code>## snapshotDate(): 2020-10-27</code></pre>
+<pre><code>## adding rname &#39;https://www.dropbox.com/s/bg8xwysh2vnjwvg/Human_DLPFC_Visium_processedData_sce_scran_sce_layer_spatialLIBD.Rdata?dl=1&#39;</code></pre>
+<pre><code>## 2021-02-24 20:21:09 loading file /tmp/Rtmp9DrSh6/BiocFileCache/13be5542adddc_Human_DLPFC_Visium_processedData_sce_scran_sce_layer_spatialLIBD.Rdata%3Fdl%3D1</code></pre>
+<pre class="r"><code>## Revisemos el tamaño de este objeto
+pryr::object_size(sce_layer)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;pryr&#39;:
+##   method      from
+##   print.bytes Rcpp</code></pre>
+<pre><code>## 34 MB</code></pre>
+<p>Generate first graph</p>
+<pre class="r"><code>iSEE::iSEE(sce_layer)</code></pre>
+<p>[image 1]</p>
+<p>Obtain a shortened version of the genes we’re interested in.</p>
+<pre class="r"><code>short&lt;-sce_layer[which(rowRanges(sce_layer)$gene_name%in%c(&quot;MOBP&quot;,&quot;MBP&quot;,&quot;PCP4&quot;)),]</code></pre>
+<p>Clustered heatmap of subset</p>
+<pre class="r"><code>iSEE::iSEE(short)</code></pre>
+<p>[image 2]</p>
+</div>
+</div>
+<div id="recount" class="section level3">
+<h3>Recount</h3>
+<p>Se limitó a humano y ratón porque son los organismos con mayor estudios de RNAseq.</p>
+<pre class="r"><code># Load recount3 R package
+library(&quot;recount3&quot;)
+human_projects &lt;- available_projects()</code></pre>
+<pre><code>## 2021-02-24 20:21:16 caching file sra.recount_project.MD.gz.</code></pre>
+<pre><code>## adding rname &#39;http://duffel.rail.bio/recount3/human/data_sources/sra/metadata/sra.recount_project.MD.gz&#39;</code></pre>
+<pre><code>## 2021-02-24 20:21:21 caching file gtex.recount_project.MD.gz.</code></pre>
+<pre><code>## adding rname &#39;http://duffel.rail.bio/recount3/human/data_sources/gtex/metadata/gtex.recount_project.MD.gz&#39;</code></pre>
+<pre><code>## 2021-02-24 20:21:24 caching file tcga.recount_project.MD.gz.</code></pre>
+<pre><code>## adding rname &#39;http://duffel.rail.bio/recount3/human/data_sources/tcga/metadata/tcga.recount_project.MD.gz&#39;</code></pre>
+<p>Tomamos el id del experimento de interés y se crea un objeto.</p>
+<pre class="r"><code>proj_info &lt;- subset(
+    human_projects,
+    project == &quot;SRP009615&quot; &amp; project_type == &quot;data_sources&quot;
+)
+## Crea un objetio de tipo RangedSummarizedExperiment (RSE)
+## con la información a nivel de genes
+rse_gene_SRP009615 &lt;- create_rse(proj_info)
+rse_gene_SRP009615</code></pre>
+<pre class="r"><code>## Explora los proyectos disponibles de forma interactiva
+proj_info_interactive &lt;- interactiveDisplayBase::display(human_projects)
+## Selecciona un solo renglón en la tabla y da click en &quot;send&quot;.
+
+## Aquí verificamos que solo seleccionaste un solo renglón.
+stopifnot(nrow(proj_info_interactive) == 1)
+## Crea el objeto RSE
+rse_gene_interactive &lt;- create_rse(proj_info_interactive)</code></pre>
+<pre class="r"><code>assay(rse_gene_SRP009615, &quot;counts&quot;) &lt;- compute_read_counts(rse_gene_SRP009615)
+
+rse_gene_SRP009615 &lt;- expand_sra_attributes(rse_gene_SRP009615)
+colData(rse_gene_SRP009615)[
+    ,
+    grepl(&quot;^sra_attribute&quot;, colnames(colData(rse_gene_SRP009615)))
+]</code></pre>
+<p>La función de expand sólo se puede utilizar si sólo hay un set de datos.</p>
+<div id="ejercicio" class="section level4">
+<h4>Ejercicio</h4>
+<pre class="r"><code>iSEE::iSEE(rse_gene_SRP009615)</code></pre>
+<p>[image 3]</p>
+</div>
+</div>
 </div>
 
 

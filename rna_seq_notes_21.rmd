@@ -209,7 +209,92 @@ head(rowRanges(rse))
 print('COLDATA')
 head(colData(rse))
 ```
+To view all of this information in painfully beautiful graphs, do:
+```{r eval=FALSE}
+## Explora el objeto rse de forma interactiva
+library("iSEE")
+iSEE::iSEE(rse)
+```
+
+#### Exercise 2
+```{r}
+## Descarguemos unos datos de spatialLIBD
+sce_layer <- spatialLIBD::fetch_data("sce_layer")
+
+## Revisemos el tamaño de este objeto
+pryr::object_size(sce_layer)
 
 
+```
+Generate first graph
+```{r eval=FALSE}
+iSEE::iSEE(sce_layer)
+```
 
+[image 1]
+
+Obtain a shortened version of the genes we're interested in.
+```{r}
+short<-sce_layer[which(rowRanges(sce_layer)$gene_name%in%c("MOBP","MBP","PCP4")),]
+```
+Clustered heatmap of subset
+```{r eval=FALSE}
+iSEE::iSEE(short)
+
+```
+
+[image 2]
+
+### Recount
+
+Se limitó a humano y ratón porque son los organismos con mayor estudios de RNAseq.
+```{r}
+# Load recount3 R package
+library("recount3")
+human_projects <- available_projects()
+``` 
+
+Tomamos el id del experimento de interés y se crea un objeto.
+
+```{r eval=FALSE}
+proj_info <- subset(
+    human_projects,
+    project == "SRP009615" & project_type == "data_sources"
+)
+## Crea un objetio de tipo RangedSummarizedExperiment (RSE)
+## con la información a nivel de genes
+rse_gene_SRP009615 <- create_rse(proj_info)
+rse_gene_SRP009615
+```
+```{r eval=FALSE}
+## Explora los proyectos disponibles de forma interactiva
+proj_info_interactive <- interactiveDisplayBase::display(human_projects)
+## Selecciona un solo renglón en la tabla y da click en "send".
+
+## Aquí verificamos que solo seleccionaste un solo renglón.
+stopifnot(nrow(proj_info_interactive) == 1)
+## Crea el objeto RSE
+rse_gene_interactive <- create_rse(proj_info_interactive)
+
+```
+
+```{r eval=FALSE}
+assay(rse_gene_SRP009615, "counts") <- compute_read_counts(rse_gene_SRP009615)
+
+rse_gene_SRP009615 <- expand_sra_attributes(rse_gene_SRP009615)
+colData(rse_gene_SRP009615)[
+    ,
+    grepl("^sra_attribute", colnames(colData(rse_gene_SRP009615)))
+]
+```
+
+La función de expand sólo se puede utilizar si sólo hay un set de datos. 
+
+#### Ejercicio
+```{r eval=FALSE}
+
+iSEE::iSEE(rse_gene_SRP009615)
+```
+
+[image 3]
 
