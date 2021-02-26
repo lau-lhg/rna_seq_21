@@ -186,7 +186,7 @@ head(assay(rse[1:2, ]))
 ```
 Como los renglones corresponden a los genes, aqui nos muestra un sub-set con sólo los primeros 2 genes.
 
-```{r}
+```{r eval=FALSE}
 ## Comando 2
 rse[, c("A", "D", "F")]
 head(assay(rse[, c("A", "D", "F")]))
@@ -195,13 +195,13 @@ which(colnames(rse)%in%c("A", "D", "F"))
 ```
 Como las columnas son muestras, aquí accesamos a un subset con las primeras tres.
 
-```{r}
+```{r eval=FALSE}
 #tambien podemos accesar así
 rse$Treatment
 ```
 
 Exploremos las tres sub-tablas de nuestro objeto.
-```{r}
+```{r eval=FALSE}
 print('ASSAY')
 head(assay(rse))
 print('ROWRANGES')
@@ -217,7 +217,7 @@ iSEE::iSEE(rse)
 ```
 
 #### Exercise 2
-```{r}
+```{r eval=FALSE}
 ## Descarguemos unos datos de spatialLIBD
 sce_layer <- spatialLIBD::fetch_data("sce_layer")
 
@@ -248,7 +248,7 @@ iSEE::iSEE(short)
 ### Recount
 
 Se limitó a humano y ratón porque son los organismos con mayor estudios de RNAseq.
-```{r}
+```{r eval=FALSE}
 # Load recount3 R package
 library("recount3")
 human_projects <- available_projects()
@@ -297,4 +297,32 @@ iSEE::iSEE(rse_gene_SRP009615)
 ```
 
 [image 3]
+
+### Model Matrix
+
+Con R, usamos mucho la función model.matrix() y la sintáxis de fórmula Y ~ X1 + X2.
+
+Interpretación de Y ~ X1 + X2
+- La virgulilla se usa para separar a las Xs de la Y.
+- Puede haber más de una X (se usa '+' para indicarlo), pero sólo una Y.
+
+```{r eval=FALSE}
+# Datos de ejemplo
+(sampleData <- data.frame(
+    genotype = rep(c("A", "B"), each = 4),
+    treatment = rep(c("ctrl", "trt"), 4)
+))
+
+## Creemos las imágenes usando ExploreModelMatrix
+vd <- ExploreModelMatrix::VisualizeDesign(
+    sampleData = sampleData,
+    designFormula = ~ genotype + treatment,
+    textSizeFitted = 4
+)
+
+## Veamos las imágenes
+cowplot::plot_grid(plotlist = vd$plotlist)
+```
+
+
 
